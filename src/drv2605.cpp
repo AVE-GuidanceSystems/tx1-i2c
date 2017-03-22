@@ -1,45 +1,55 @@
 /*
  * drv2605.cpp
  *
- *  Created on: Mar 20, 2017
+ *  Created on: Mar 21, 2017
  *      Author: christian
  */
 
+#include "drv2605.h"
+using namespace drv2605;
+
 drv2605::drv2605(){
+	drv2605::kI2CBus = 1;
+	drv2605::error = 0;
+}
+bool drv2605::begin(){
 
 }
-boolean drv2605::begin(){
+
+void drv2605::writeRegistar8(unsigned char reg, unsigned char val){
+
+}
+void setWaveform(unsigned char slot, unsigned char w){
 
 }
 
-void writeRegistar8(unit8_t reg, uint8_t val){
+void selectLibrary(unsigned char lib){
 
 }
-void setWaveform(uint8_t slot, uint8_t w){
+void go(){
 
 }
-  void selectLibrary(uint8_t lib){
+void stop(){
 
-  }
-  void go(){
+}
 
-  }
-  void stop(){
+void setMode(unsigned char mode){
 
-  }
-  void setMode(uint8_t mode){
+}
 
-  }
-  void setRealtimeValue(uint8_t rtp){
+void setRealtimeValue(unsigned char rtp){
 
-  }
-  // Select ERM (Eccentric Rotating Mass) or LRA (Linear Resonant Actuator) vibration motor
-  // The default is ERM, which is more common
-  void useERM(){
+}
+// Select ERM (Eccentric Rotating Mass) or LRA (Linear Resonant Actuator) vibration motor
+// The default is ERM, which is more common
+void useERM(){
 
-  }
-  void useLRA(){
+}
+void useLRA(){
 
-  }
+}
+
+
+
 
 

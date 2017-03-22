@@ -1,7 +1,7 @@
 /*
  * drv2605.h
  *
- *  Created on: Mar 20, 2017
+ *  Created on: Mar 21, 2017
  *      Author: christian
  */
 
@@ -16,6 +16,8 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <errno.h>
+#include <iostream>
+
 
 #define DRV2605_ADDR 0x5A
 
@@ -69,21 +71,19 @@ public:
 	int error;
 
 	drv2605(void);
-	boolean begin(void);
+	bool begin(void);
 
-	void writeRegistar8(unit8_t reg, uint8_t val);
-	void setWaveform(uint8_t slot, uint8_t w);
-	  void selectLibrary(uint8_t lib);
-	  void go(void);
-	  void stop(void);
-	  void setMode(uint8_t mode);
-	  void setRealtimeValue(uint8_t rtp);
-	  // Select ERM (Eccentric Rotating Mass) or LRA (Linear Resonant Actuator) vibration motor
-	  // The default is ERM, which is more common
-	  void useERM();
-	  void useLRA();
-
-private:
+	void writeRegistar8(unsigned char reg, unsigned char val);
+	void setWaveform(unsigned char slot, unsigned char w);
+	void selectLibrary(unsigned char lib);
+	void go(void);
+	void stop(void);
+	void setMode(unsigned char mode);
+	void setRealtimeValue(unsigned char rtp);
+	// Select ERM (Eccentric Rotating Mass) or LRA (Linear Resonant Actuator) vibration motor
+	// The default is ERM, which is more common
+	void useERM();
+	void useLRA();
 
 };
 
