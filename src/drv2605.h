@@ -73,15 +73,16 @@ public:
 	drv2605(void);
 	bool begin(void);
 
+	unsigned char readReagister8(unsigned char reg);
 	void writeRegistar8(unsigned char reg, unsigned char val);
+
 	void setWaveform(unsigned char slot, unsigned char w);
 	void selectLibrary(unsigned char lib);
 	void go(void);
 	void stop(void);
 	void setMode(unsigned char mode);
 	void setRealtimeValue(unsigned char rtp);
-	// Select ERM (Eccentric Rotating Mass) or LRA (Linear Resonant Actuator) vibration motor
-	// The default is ERM, which is more common
+
 	void useERM();
 	void useLRA();
 
