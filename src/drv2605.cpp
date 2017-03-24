@@ -41,6 +41,31 @@ bool DRV2605::begin(){
   return true;
 }
 
+bool DRV2605::activateI2C(){
+    char fileNameBuffer[32];
+    sprintf(fileNameBuffer,"/dev/i2c-%d", kI2CBus);
+    kI2CFileDescriptor = open(fileNameBuffer, O_RDWR);
+    if (kI2CFileDescriptor < 0) {
+        // Could not open the file
+        error = errno ;
+        return false ;
+    }
+    if (ioctl(kI2CFileDescriptor, I2C_SLAVE, DRV2605_ADDR) < 0) {
+        // Could not open the device on the bus
+        error = errno ;
+        return false ;
+    }
+    return true ;
+}
+
+void DRV2605::deactivateI2C(){
+	if (kI2CFileDescriptor > 0) {
+		close(kI2CFileDescriptor);
+		// WARNING - This is not quite right, need to check for error first
+		kI2CFileDescriptor = -1 ;
+	}
+}
+
 //Write and Read are only ones needing translation
 void DRV2605::writeRegister8(unsigned char reg, unsigned char val){
 	/*
