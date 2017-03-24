@@ -7,43 +7,42 @@
 
 #include "drv2605.h"
 
-using namespace drv2605;
 
-drv2605::drv2605(){
-	drv2605::kI2CBus = 1;
-	drv2605::error = 0;
+DRV2605::DRV2605(void){
+	DRV2605::kI2CBus = 1;
+	DRV2605::error = 0;
 }
-bool drv2605::begin(){
+bool DRV2605::begin(){
   //Wire.begin(); //find suitable replacement
-  unsigned char id = readRegister8(DRV2605_REG_STATUS);
+  unsigned char id = DRV2605::readRegister8(DRV2605_REG_STATUS);
   //cout << "Status 0x" << "id %h" << endl;  // Print Id to commandline
 
-  writeRegister8(DRV2605_REG_MODE, 0x00); // out of standby
+  DRV2605::writeRegister8(DRV2605_REG_MODE, 0x00); // out of standby
 
-  writeRegister8(DRV2605_REG_RTPIN, 0x00); // no real-time-playback
+  DRV2605::writeRegister8(DRV2605_REG_RTPIN, 0x00); // no real-time-playback
 
-  writeRegister8(DRV2605_REG_WAVESEQ1, 1); // strong click
-  writeRegister8(DRV2605_REG_WAVESEQ2, 0);
+  DRV2605::writeRegister8(DRV2605_REG_WAVESEQ1, 1); // strong click
+  DRV2605::writeRegister8(DRV2605_REG_WAVESEQ2, 0);
 
-  writeRegister8(DRV2605_REG_OVERDRIVE, 0); // no overdrive
+  DRV2605::writeRegister8(DRV2605_REG_OVERDRIVE, 0); // no overdrive
 
-  writeRegister8(DRV2605_REG_SUSTAINPOS, 0);
-  writeRegister8(DRV2605_REG_SUSTAINNEG, 0);
-  writeRegister8(DRV2605_REG_BREAK, 0);
-  writeRegister8(DRV2605_REG_AUDIOMAX, 0x64);
+  DRV2605::writeRegister8(DRV2605_REG_SUSTAINPOS, 0);
+  DRV2605::writeRegister8(DRV2605_REG_SUSTAINNEG, 0);
+  DRV2605::writeRegister8(DRV2605_REG_BREAK, 0);
+  DRV2605::writeRegister8(DRV2605_REG_AUDIOMAX, 0x64);
 
   // Set as ERM Open Loop type. Adjust in main to make of type LRA
 
   // turn off N_ERM_LRA
-  writeRegister8(DRV2605_REG_FEEDBACK, readRegister8(DRV2605_REG_FEEDBACK) & 0x7F);
+  DRV2605::writeRegister8(DRV2605_REG_FEEDBACK, readRegister8(DRV2605_REG_FEEDBACK) & 0x7F);
   // turn on ERM_OPEN_LOOP
-  writeRegister8(DRV2605_REG_CONTROL3, readRegister8(DRV2605_REG_CONTROL3) | 0x20);
+  DRV2605::writeRegister8(DRV2605_REG_CONTROL3, readRegister8(DRV2605_REG_CONTROL3) | 0x20);
 
   return true;
 }
 
 //Write and Read are only ones needing translation
-void drv2605::writeRegistar8(unsigned char reg, unsigned char val){
+void DRV2605::writeRegister8(unsigned char reg, unsigned char val){
 	/*
 		// use i2c
 		Wire.beginTransmission(DRV2605_ADDR);
@@ -52,13 +51,13 @@ void drv2605::writeRegistar8(unsigned char reg, unsigned char val){
 		Wire.endTransmission();
 	}
 
-	/****************/
-
 
 	// Allow users to use ERM motor or LRA motors
+	 *
+	 */
 
 }
-unsigned char drv2605::readRegister(unsigned char reg){
+unsigned char DRV2605::readRegister8(unsigned char reg){
 	/*
 	 *  uint8_t x ;
    // use i2c
@@ -76,33 +75,33 @@ unsigned char drv2605::readRegister(unsigned char reg){
 	 */
 
 }
-void drv2605::setWaveform(unsigned char slot, unsigned char w){
+void DRV2605::setWaveform(unsigned char slot, unsigned char w){
+
+}
+
+void DRV2605::selectLibrary(unsigned char lib){
 	writeRegister8(DRV2605_REG_LIBRARY, lib);
 }
-
-void sdrv2605::selectLibrary(unsigned char lib){
-
-}
-void drv2605::go(){
+void DRV2605::go(){
 	writeRegister8(DRV2605_REG_GO, 1);
 }
-void drv2605::stop(){
+void DRV2605::stop(){
 	writeRegister8(DRV2605_REG_GO, 0);
 }
 
-void drv2605::setMode(unsigned char mode){
+void DRV2605::setMode(unsigned char mode){
 	writeRegister8(DRV2605_REG_MODE, mode);
 }
 
-void drv2605::setRealtimeValue(unsigned char rtp){
+void DRV2605::setRealtimeValue(unsigned char rtp){
 	writeRegister8(DRV2605_REG_RTPIN, rtp);
 }
 // Select ERM (Eccentric Rotating Mass) or LRA (Linear Resonant Actuator) vibration motor
 // The default is ERM, which is more common
-void drv2605::useERM(){
+void DRV2605::useERM(){
 	writeRegister8(DRV2605_REG_FEEDBACK, readRegister8(DRV2605_REG_FEEDBACK) & 0x7F);
 }
-void drv2605::useLRA(){
+void DRV2605::useLRA(){
 	writeRegister8(DRV2605_REG_FEEDBACK, readRegister8(DRV2605_REG_FEEDBACK) | 0x80);
 }
 

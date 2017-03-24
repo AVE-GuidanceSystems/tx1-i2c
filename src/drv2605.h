@@ -64,17 +64,17 @@
 #define DRV2605_REG_VBAT 			0x21
 #define DRV2605_REG_LRARESON 		0x22
 
-class drv2605 {
+class DRV2605 {
 public:
 	unsigned char kI2CBus;         // I2C bus of the Lidar-Lite
 	int kI2CFileDescriptor;        // File Descriptor to the Lidar-Lite
 	int error;
 
-	drv2605(void);
+	DRV2605(void);
 	bool begin(void);
 
-	unsigned char readReagister8(unsigned char reg);
-	void writeRegistar8(unsigned char reg, unsigned char val);
+	unsigned char readRegister8(unsigned char reg);
+	void writeRegister8(unsigned char reg, unsigned char val);
 
 	void setWaveform(unsigned char slot, unsigned char w);
 	void selectLibrary(unsigned char lib);
