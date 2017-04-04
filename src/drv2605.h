@@ -8,15 +8,18 @@
 #ifndef DRV2605_H_
 #define DRV2605_H_
 
-#include <cstddef>
+#include <glib.h>
+#include <glib/gprintf.h>
+#include <errno.h>
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 #include <linux/i2c-dev.h>
 #include <sys/ioctl.h>
-#include <cstdlib>
-#include <cstdio>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <fcntl.h>
-#include <unistd.h>
-#include <errno.h>
-#include <iostream>
 
 
 #define DRV2605_ADDR 0x5A
@@ -66,7 +69,7 @@
 
 class DRV2605 {
 public:
-	unsigned char kI2CBus;         // I2C bus of the Lidar-Lite
+	unsigned char I2CBus;         // I2C bus of the Lidar-Lite
 	int kI2CFileDescriptor;        // File Descriptor to the Lidar-Lite
 	int error;
 
