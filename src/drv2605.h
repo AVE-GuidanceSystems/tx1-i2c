@@ -75,6 +75,8 @@ public:
 
 	DRV2605(void);
 	bool begin(void);
+	bool activateI2C(void);
+	void deactivateI2C(void);
 
 	unsigned char readRegister8(unsigned char reg);
 	void writeRegister8(unsigned char reg, unsigned char val);

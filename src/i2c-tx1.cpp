@@ -8,6 +8,7 @@
 
 #include <iostream>
 #include "drv2605.h"
+<<<<<<< HEAD
 //#include "JetsonGPIO.h"
 
 using namespace std;
@@ -39,6 +40,28 @@ int main() {
 		
 		//deactivate motor trigger..move on to next motor
 	}
+=======
+using namespace std;
+
+drv2605 drv;
+
+int main() {
+    drv.begin();
+    drv.selectLibrary(1);
+    drv.setMode(DRV2605_MODE_INTTRIG);
+    
+    
+    while(1){
+        drv.setWaveform(0, 47); //selects specified waveform
+        drv.setWaveform(1,0);   //ends waveform
+        drv.go();               //starts effect
+        
+        usleep(500);     //milliseconds
+        
+        
+    }//while
+    
+>>>>>>> origin/master
 	return 0;
 }
 /*  ******  Original Arduino Code bellow *******
