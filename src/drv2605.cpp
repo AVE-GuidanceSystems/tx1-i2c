@@ -16,7 +16,7 @@ DRV2605::DRV2605(void){
 bool DRV2605::begin(){
   //Wire.begin(); //find suitable replacement
   unsigned char id = DRV2605::readRegister8(DRV2605_REG_STATUS);
-  cout << "Status 0x" << id << endl;  // Print Id to commandline
+  cout << "Status 0x" << hex << id << endl;  // Print Id to commandline
 
   DRV2605::writeRegister8(DRV2605_REG_MODE, 0x00); // out of standby
 
