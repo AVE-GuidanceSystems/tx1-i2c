@@ -16,7 +16,7 @@ DRV2605::DRV2605(void){
 bool DRV2605::begin(){
   //Wire.begin(); //find suitable replacement
   unsigned char id = DRV2605::readRegister8(DRV2605_REG_STATUS);
-  //cout << "Status 0x" << "id %h" << endl;  // Print Id to commandline
+  cout << "Status 0x" << id << endl;  // Print Id to commandline
 
   DRV2605::writeRegister8(DRV2605_REG_MODE, 0x00); // out of standby
 
@@ -68,7 +68,7 @@ void DRV2605::deactivateI2C(){
 }
 
 //Write and Read are only ones needing translation
-void DRV2605::writeRegister8(char reg, char val){
+void DRV2605::writeRegister8(__u8 reg, __u8 val){
 	/*
 		// use i2c
 		Wire.beginTransmission(DRV2605_ADDR);
@@ -85,7 +85,6 @@ void DRV2605::writeRegister8(char reg, char val){
 	//Check Status of Bus
 	int file;
 	char filename[40];
-    const gchar *buffer;
     
 	sprintf(filename,"/dev/i2c-%d",I2CBus);
 	if ((file = open(filename, O_RDWR)) < 0) {
@@ -102,24 +101,10 @@ void DRV2605::writeRegister8(char reg, char val){
 	}
 	
 	//Write Byte / Check for Errors
-	if (write(file, &reg, 1) != 1) {
-    /* ERROR HANDLING: i2c transaction failed */
-    printf("Failed to write to the i2c bus.\n");
-    buffer = g_strerror(errno);
-    printf(buffer);
-    printf("\n\n");
-	}
-	
-	if (write(file, &val,1 ) != 1) {
-    /* ERROR HANDLING: i2c transaction failed */
-    printf("Failed to write to the i2c bus.\n");
-    buffer = g_strerror(errno);
-    printf(buffer);
-    printf("\n\n");
-	}
+	i2c_smbus_write_word_data(file, reg, val); //write Value -> Register
 
 }
-unsigned char DRV2605::readRegister8(unsigned char reg){
+char DRV2605::readRegister8(__u8 reg){
 	/*
 	 *  uint8_t x ;
    // use i2c
@@ -137,7 +122,8 @@ unsigned char DRV2605::readRegister8(unsigned char reg){
 	 */
 	int file;
 	char filename[40];
-    const gchar *buffer;
+	__s8 data;
+	char value;
     
 	//Check Status of Bus    
 	sprintf(filename,"/dev/i2c-%d",I2CBus);
@@ -152,32 +138,17 @@ unsigned char DRV2605::readRegister8(unsigned char reg){
 		printf("Failed to acquire bus access and/or talk to slave.\n");
 		/* ERROR HANDLING; you can check errno to see what went wrong */
 		exit(1);
-	}
-	
-	//Write Byte / Check for Errors
-	if (write(file,&reg,1) != 1) {
-    /* ERROR HANDLING: i2c transaction failed */
-    printf("Failed to write to the i2c bus.\n");
-    buffer = g_strerror(errno);
-    printf(buffer);
-    printf("\n\n");
-	}		
-    
-    char buf = {0};
-	char data;
+	}	
+    	
 	// Using I2C Read
-	if (read(file,&buf,1) != 1) {	/* ERROR HANDLING: i2c transaction failed */
-		printf("Failed to read from the i2c bus.\n");
-		buffer = g_strerror(errno);
-		printf(buffer);
-		printf("\n\n");
+	data = i2c_smbus_read_word_data(file, reg);
+	if (data < 0) {
+		/* ERROR HANDLING: i2c transaction failed */
 	} else {
-		data = (char) buf;
-		//~ data = data/4096*5;
-		//~ channel = ((buf[0] & 0b00110000)>>4);
-		//~ printf("Data:  %#02x\n",data);
+		/* correctly read byte */
 	}
-	return data;
+	value = (char)data;
+	return value;
 }
 void DRV2605::setWaveform(unsigned char slot, unsigned char w){
 

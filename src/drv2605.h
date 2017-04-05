@@ -16,6 +16,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <linux/i2c-dev.h>
+//#include <linux/i2c.h>
+#include <linux/types.h>
 #include <sys/ioctl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -79,8 +81,8 @@ public:
 	bool activateI2C(void);
 	void deactivateI2C(void);
 
-	unsigned char readRegister8(unsigned char reg);
-	void writeRegister8(char reg, char val);
+	char readRegister8(__u8 reg);
+	void writeRegister8(__u8 reg, __u8 val);
 
 	void setWaveform(unsigned char slot, unsigned char w);
 	void selectLibrary(unsigned char lib);
