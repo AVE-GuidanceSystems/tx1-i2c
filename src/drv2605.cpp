@@ -7,6 +7,7 @@
 
 #include "drv2605.h"
 
+using namespace std;
 
 DRV2605::DRV2605(void){
 	DRV2605::I2CBus = 1;
@@ -43,7 +44,7 @@ bool DRV2605::begin(){
 
 bool DRV2605::activateI2C(){
     char fileNameBuffer[32];
-    sprintf(fileNameBuffer,"/dev/i2c-%d", kI2CBus);
+    sprintf(fileNameBuffer,"/dev/i2c-1");
     kI2CFileDescriptor = open(fileNameBuffer, O_RDWR);
     if (kI2CFileDescriptor < 0) {
         // Could not open the file
@@ -67,7 +68,7 @@ void DRV2605::deactivateI2C(){
 }
 
 //Write and Read are only ones needing translation
-void DRV2605::writeRegister8(unsigned char reg, unsigned char val){
+void DRV2605::writeRegister8(char reg, char val){
 	/*
 		// use i2c
 		Wire.beginTransmission(DRV2605_ADDR);
@@ -101,20 +102,21 @@ void DRV2605::writeRegister8(unsigned char reg, unsigned char val){
 	}
 	
 	//Write Byte / Check for Errors
-	if (write(file,reg,1) != 1) {
+	if (write(file, &reg, 1) != 1) {
     /* ERROR HANDLING: i2c transaction failed */
     printf("Failed to write to the i2c bus.\n");
     buffer = g_strerror(errno);
     printf(buffer);
     printf("\n\n");
-    
-	if (write(file,val,1) != 1) {
+	}
+	
+	if (write(file, &val,1 ) != 1) {
     /* ERROR HANDLING: i2c transaction failed */
     printf("Failed to write to the i2c bus.\n");
     buffer = g_strerror(errno);
     printf(buffer);
     printf("\n\n");
-}
+	}
 
 }
 unsigned char DRV2605::readRegister8(unsigned char reg){
@@ -153,26 +155,27 @@ unsigned char DRV2605::readRegister8(unsigned char reg){
 	}
 	
 	//Write Byte / Check for Errors
-	if (write(file,reg,1) != 1) {
+	if (write(file,&reg,1) != 1) {
     /* ERROR HANDLING: i2c transaction failed */
     printf("Failed to write to the i2c bus.\n");
     buffer = g_strerror(errno);
     printf(buffer);
     printf("\n\n");
+	}		
     
     char buf = {0};
 	char data;
 	// Using I2C Read
-	if (read(file,buf,1) != 1) {	/* ERROR HANDLING: i2c transaction failed */
+	if (read(file,&buf,1) != 1) {	/* ERROR HANDLING: i2c transaction failed */
 		printf("Failed to read from the i2c bus.\n");
 		buffer = g_strerror(errno);
 		printf(buffer);
 		printf("\n\n");
 	} else {
 		data = (char) buf;
-		data = data/4096*5;
-		channel = ((buf[0] & 0b00110000)>>4);
-		printf("Data:  %#02x\n",data);
+		//~ data = data/4096*5;
+		//~ channel = ((buf[0] & 0b00110000)>>4);
+		//~ printf("Data:  %#02x\n",data);
 	}
 	return data;
 }

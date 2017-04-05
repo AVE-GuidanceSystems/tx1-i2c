@@ -20,6 +20,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <iostream>
 
 
 #define DRV2605_ADDR 0x5A
@@ -79,7 +80,7 @@ public:
 	void deactivateI2C(void);
 
 	unsigned char readRegister8(unsigned char reg);
-	void writeRegister8(unsigned char reg, unsigned char val);
+	void writeRegister8(char reg, char val);
 
 	void setWaveform(unsigned char slot, unsigned char w);
 	void selectLibrary(unsigned char lib);

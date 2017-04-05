@@ -8,16 +8,19 @@
 
 #include <iostream>
 #include "drv2605.h"
-//#include "JetsonGPIO.h"
+#include "jetsonGPIO.h"
 
 using namespace std;
 
-#define MotorTrigger1 = 5;
-#define MotorTrigger2 = 3; //or some gpio number..probably gets replaced soon
+//#define MotorTrigger1 = 4;
+//#define MotorTrigger2 = 3; //or some gpio number..probably gets replaced soon
 
 DRV2605 drv; //create "drv" object
 
 int main() {
+
+	jetsonGPIO trig = gpio4 ;
+
 	cout << "Begin Motor Test" << endl;
 	drv.begin();
 	
@@ -29,16 +32,19 @@ int main() {
 	unsigned char effect = 1;
 	
 	while(1){
-		count << "Effect #%d" << effect << endl;
+		cout << "Effect #%d" << effect << endl;
 		//activate motor trigger
+		gpioSetValue(trig, 1);
 		drv.setWaveform(0,47);	//Run Effect #47
-		drv.setwaveform(1,0);	//End waveform
+		drv.setWaveform(1,0);	//End waveform
 		
 		drv.go(); //play effect
 		usleep(300000); //wait for 3/10 of a sec
 		
 		//deactivate motor trigger..move on to next motor
+		gpioSetValue(trig, 0);
 	}
+}
 
 /*  ******  Original Arduino Code bellow *******
  * #include <Wire.h>
