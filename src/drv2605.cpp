@@ -9,14 +9,31 @@
 
 using namespace std;
 
-DRV2605::DRV2605(void){
-	DRV2605::I2CBus = 1;
-	//DRV2605::error = 0;
+DRV2605::DRV2605(jetsonGPIO trig, int bus=0){
+	DRV2605::I2CBus = bus;
+	
+	//reset trigger
+	gpioUnexport(trig);
+	gpioExport(trig);
+	
+	//set direction;
+	gpioSetDirection(trig, 1);
+	
+	//set trigger default value
+	gpioSetValue(trig, 0); //default "off"
+	
+	trigger = trig;
+	
+	//Setup
+	begin();
+	selectLibrary(1);
+	setMode(DRV2605_MODE_INTTRIG);
 }
+
 bool DRV2605::begin(){
   //Wire.begin(); //find suitable replacement
   unsigned char id = DRV2605::readRegister8(DRV2605_REG_STATUS);
-  cout << "Status 0x" << hex << id << endl;  // Print Id to commandline
+  cout << "Status 0x" << id << endl;  // Print Id to commandline
 
   DRV2605::writeRegister8(DRV2605_REG_MODE, 0x00); // out of standby
 
@@ -44,14 +61,14 @@ bool DRV2605::begin(){
 
 bool DRV2605::activateI2C(){
     char fileNameBuffer[32];
-    sprintf(fileNameBuffer,"/dev/i2c-1");
-    kI2CFileDescriptor = open(fileNameBuffer, O_RDWR);
-    if (kI2CFileDescriptor < 0) {
+    sprintf(fileNameBuffer,"/dev/i2c-%d",I2CBus);
+    I2CFileDescriptor = open(fileNameBuffer, O_RDWR);
+    if (I2CFileDescriptor < 0) {
         // Could not open the file
         error = errno ;
         return false ;
     }
-    if (ioctl(kI2CFileDescriptor, I2C_SLAVE, DRV2605_ADDR) < 0) {
+    if (ioctl(I2CFileDescriptor, I2C_SLAVE, DRV2605_ADDR) < 0) {
         // Could not open the device on the bus
         error = errno ;
         return false ;
@@ -60,10 +77,10 @@ bool DRV2605::activateI2C(){
 }
 
 void DRV2605::deactivateI2C(){
-	if (kI2CFileDescriptor > 0) {
-		close(kI2CFileDescriptor);
+	if (I2CFileDescriptor > 0) {
+		close(I2CFileDescriptor);
 		// WARNING - This is not quite right, need to check for error first
-		kI2CFileDescriptor = -1 ;
+			I2CFileDescriptor = -1 ;
 	}
 }
 
@@ -83,27 +100,32 @@ void DRV2605::writeRegister8(__u8 reg, __u8 val){
 	 */
 	 
 	//Check Status of Bus
-	int file;
 	char filename[40];
     
 	sprintf(filename,"/dev/i2c-%d",I2CBus);
-	if ((file = open(filename, O_RDWR)) < 0) {
+	if ((I2CFileDescriptor = open(filename, O_RDWR)) < 0) {
 		/* ERROR HANDLING: you can check errno to see what went wrong */
 		perror("Failed to open the i2c bus");
 		exit(1);
 	}
 	
 	//Initiate Communication / Check for Errors
-	if (ioctl(file, I2C_SLAVE, DRV2605_ADDR) < 0) {
+	if (ioctl(I2CFileDescriptor, I2C_SLAVE, DRV2605_ADDR) < 0) {
 		printf("Failed to acquire bus access and/or talk to slave.\n");
 		/* ERROR HANDLING; you can check errno to see what went wrong */
 		exit(1);
 	}
 	
 	//Write Byte / Check for Errors
-	i2c_smbus_write_word_data(file, reg, val); //write Value -> Register
+	i2c_smbus_write_word_data(I2CFileDescriptor, reg, val); //write Value -> Register
+	close(I2CFileDescriptor); //close descriptor
 
 }
+
+void DRV2605::setTrigger(pinValue val){
+	gpioSetValue(trigger, val);
+}
+
 char DRV2605::readRegister8(__u8 reg){
 	/*
 	 *  uint8_t x ;
@@ -120,38 +142,39 @@ char DRV2605::readRegister8(__u8 reg){
   return x;
 }
 	 */
-	int file;
 	char filename[40];
 	__s8 data;
 	char value;
     
 	//Check Status of Bus    
 	sprintf(filename,"/dev/i2c-%d",I2CBus);
-	if ((file = open(filename, O_RDWR)) < 0) {
+	if ((I2CFileDescriptor = open(filename, O_RDWR)) < 0) {
 		/* ERROR HANDLING: you can check errno to see what went wrong */
 		perror("Failed to open the i2c bus");
 		exit(1);
 	}
 	
 	//Initiate Communication / Check for Errors
-	if (ioctl(file, I2C_SLAVE, DRV2605_ADDR) < 0) {
+	if (ioctl(I2CFileDescriptor, I2C_SLAVE, DRV2605_ADDR) < 0) {
 		printf("Failed to acquire bus access and/or talk to slave.\n");
 		/* ERROR HANDLING; you can check errno to see what went wrong */
 		exit(1);
 	}	
     	
 	// Using I2C Read
-	data = i2c_smbus_read_word_data(file, reg);
+	data = i2c_smbus_read_word_data(I2CFileDescriptor, reg);
 	if (data < 0) {
 		/* ERROR HANDLING: i2c transaction failed */
 	} else {
 		/* correctly read byte */
 	}
 	value = (char)data;
+	close(I2CFileDescriptor);
 	return value;
 }
-void DRV2605::setWaveform(unsigned char slot, unsigned char w){
 
+void DRV2605::setWaveform(unsigned char slot, unsigned char w){
+	writeRegister8(DRV2605_REG_WAVESEQ1+slot,w);
 }
 
 void DRV2605::selectLibrary(unsigned char lib){

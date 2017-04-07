@@ -20,6 +20,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <iostream>
+#include "jetsonGPIO.h"
 
 
 #define DRV2605_ADDR 0x5A
@@ -70,10 +71,11 @@
 class DRV2605 {
 public:
 	unsigned char I2CBus;         // I2C bus of the Lidar-Lite
-	int kI2CFileDescriptor;        // File Descriptor to the Lidar-Lite
+	int I2CFileDescriptor;        // File Descriptor
 	int error;
+	jetsonGPIO trigger;
 
-	DRV2605(void);
+	DRV2605(jetsonGPIO, int);
 	bool begin(void);
 	bool activateI2C(void);
 	void deactivateI2C(void);
@@ -87,6 +89,7 @@ public:
 	void stop(void);
 	void setMode(unsigned char mode);
 	void setRealtimeValue(unsigned char rtp);
+	void setTrigger(pinValue);
 
 	void useERM();
 	void useLRA();
